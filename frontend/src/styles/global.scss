@@ -1,0 +1,133 @@
+// Variáveis
+$color-primary: #84e;
+$color-primary-dark: #52a;
+$color-secondary: #5c7;
+$color-accent: #fa2;
+$color-bg: #223;
+$color-text-light: #eee;
+$color-success: #2a4;
+$color-warning: #fc0;
+$color-error: #d34;
+$shadow-light: 0 2px 8px #0000001a;
+$shadow-medium: 0 4px 12px #00000026;
+
+// Mixins
+@mixin button-style($bg-color: $color-primary, $hover-color: $color-primary-dark) {
+  background-color: $bg-color;
+  color: #fff;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: $hover-color;
+  }
+}
+
+// Estilos globais
+:root {
+  /* Cores principais */
+  --color-primary: #{$color-primary};
+  --color-primary-dark: #{$color-primary-dark};
+  --color-secondary: #{$color-secondary};
+  --color-accent: #{$color-accent};
+
+  /* Cores neutras */
+  --color-bg: #{$color-bg};
+  --color-text-light: #{$color-text-light};
+
+  /* Alertas / Status */
+  --color-success: #{$color-success};
+  --color-warning: #{$color-warning};
+  --color-error: #{$color-error};
+
+  /* Sombras */
+  --shadow-light: #{$shadow-light};
+  --shadow-medium: #{$shadow-medium};
+}
+
+body {
+  background-color: $color-bg;
+  color: #fff;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+// Componentes
+button {
+  @include button-style;
+  
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  
+  // Variações de botão
+  &.secondary {
+    @include button-style($color-secondary, darken($color-secondary, 10%));
+  }
+  
+  &.accent {
+    @include button-style($color-accent, darken($color-accent, 10%));
+  }
+  
+  &.outline {
+    background-color: transparent;
+    border: 2px solid $color-primary;
+    color: $color-primary;
+    
+    &:hover {
+      background-color: $color-primary;
+      color: #fff;
+    }
+  }
+}
+
+// Classes utilitárias
+.text-light {
+  color: $color-text-light;
+}
+
+.bg-primary {
+  background-color: $color-primary;
+}
+
+.bg-secondary {
+  background-color: $color-secondary;
+}
+
+// Card component (descomentado e melhorado)
+.card {
+  background-color: lighten($color-bg, 5%);
+  box-shadow: $shadow-light;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  
+  &-header {
+    border-bottom: 1px solid lighten($color-bg, 15%);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  &-title {
+    margin: 0;
+    color: $color-text-light;
+    font-size: 1.25rem;
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
