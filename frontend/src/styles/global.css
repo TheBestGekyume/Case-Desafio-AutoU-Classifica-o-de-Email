@@ -31,7 +31,7 @@ button {
     background-color: var(--color-primary);
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: 0.75rem;
     cursor: pointer;
 }
 
