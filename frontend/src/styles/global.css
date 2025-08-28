@@ -1,0 +1,47 @@
+:root {
+    /* Cores principais */
+    --color-primary: #84e;
+    --color-primary-dark: #52a;
+    --color-secondary: #5c7;
+    --color-accent: #fa2;
+
+    /* Cores neutras */
+    --color-bg: #223;
+    --color-text-light: #eee;
+
+    /* Alertas / Status */
+    --color-success: #2a4;
+    --color-warning: #fc0;
+    --color-error: #d34;
+
+    /* Sombras */
+    --shadow-light: 0 2px 8px #0000001a;
+    --shadow-medium: 0 4px 12px #00000026;
+}
+
+body {
+    background-color: var(--color-bg);
+    color: #fff;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+button {
+    background-color: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--color-primary-dark);
+}
+
+/* .card {
+    background-color: var(--color-card-bg);
+    box-shadow: var(--shadow-light);
+    border-radius: 12px;
+    padding: 20px;
+} */
