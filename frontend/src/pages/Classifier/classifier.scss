@@ -1,102 +1,225 @@
-$class-bg: #223;           // Fundo da página
-$card-bg: #334;            // Fundo do card/form
-$primary: #4a90e2;         // Cor do botão
-$primary-dark: #357ab8;
-$text: #fff;
+$color-bg: #223;
+$card-bg: #334;
+$color-primary: #84e;
+$color-primary-dark: #52a;
 $text-light: #ccc;
-$border-radius: 12px;
+$border-radius: 0.5rem;
 
 #classifier {
-  min-height: 100vh;
-  background-color: $class-bg;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  color: $text;
-
-  h1 {
-    font-size: 2rem;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-
-  .classifier-card {
-    background-color: $card-bg;
-    padding: 30px 40px;
-    border-radius: $border-radius;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    background-color: $color-bg;
+    // min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: 500px;
+    padding: 10px;
 
-    form {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-
-      textarea {
-        width: 100%;
-        min-height: 120px;
-        padding: 12px;
-        border-radius: $border-radius;
-        border: 1px solid darken($card-bg, 10%);
-        background-color: lighten($card-bg, 5%);
-        color: $text;
+    .user-info {
+        position: fixed;
+        top: 15px;
+        left: 20px;
+        display: flex;
+        flex-direction: column;
         font-size: 1rem;
-        resize: vertical;
-      }
-
-      input[type="file"] {
         color: $text-light;
-      }
-
-      button {
-        padding: 12px 24px;
-        background-color: $primary;
-        color: $text;
-        border: none;
-        border-radius: $border-radius;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: transform 0.3s, background-color 0.3s;
+        transition: 300ms;
+        border-bottom: 1px solid transparent;
 
         &:hover {
-          transform: scale(1.05);
-          background-color: $primary-dark;
+            transform: translateY(6px);
+            border-bottom: 1px solid #fff;
         }
-      }
+
+        svg {
+            fill: #000;
+            transition: 300ms;
+            cursor: pointer;
+
+            &:hover {
+                fill: $text-light;
+            }
+        }
     }
 
-    .result {
-      margin-top: 20px;
-      width: 100%;
-      background-color: lighten($card-bg, 5%);
-      padding: 20px;
-      border-radius: $border-radius;
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+    .classifier-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
 
-      .category {
-        font-weight: bold;
-        font-size: 1.2rem;
-        color: $primary;
-      }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
 
-      .confidence {
-        font-size: 0.9rem;
-        color: $text-light;
-        margin-top: 5px;
-      }
+        .classifier-card {
+            background-color: $card-bg;
+            padding: 25px;
+            border-radius: $border-radius;
+            box-shadow: 0 4px 15px #0000004d;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
 
-      .response {
-        margin-top: 10px;
-        font-size: 1rem;
-        font-style: italic;
-      }
+            #form {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+
+                label {
+                    font-size: 1.1rem;
+                }
+
+                .tab {
+                    border-bottom: 1px solid transparent;
+                    cursor: pointer;
+                    transition: 250ms;
+                }
+
+                .tab.active {
+                    border-bottom: 2px solid #007bff;
+                }
+
+                .tab-content {
+                    max-height: 0;
+                    opacity: 0;
+                    overflow: hidden;
+                    transform: translateY(-50px);
+                    transition: 400ms ease;
+                }
+
+                .tab-content.active {
+                    max-height: 250px;
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+
+                input,
+                textarea {
+                    width: 100%;
+                    padding: 10px 8px;
+                    border-radius: $border-radius;
+                    border: 1px solid darken($card-bg, 10%);
+                    background-color: lighten($card-bg, 5%);
+                    color: #fff;
+                    font-size: 1rem;
+                    transition: 300ms;
+
+                    &:focus {
+                        outline: none;
+                        background-color: darken($card-bg, 15%);
+                    }
+                }
+
+                input[type="file"] {
+                    color: $text-light;
+                }
+
+                button {
+                    padding: 12px 24px;
+                    background-color: $color-primary;
+                    border: none;
+                    border-radius: $border-radius;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    transition: transform 0.3s, background-color 0.3s;
+
+                    &:hover {
+                        transform: scale(1.05);
+                        background-color: $color-primary-dark;
+                    }
+                }
+            }
+        }
+
+        .result-table {
+            overflow-x: auto;
+            width: 75%;
+
+            table {
+                border-collapse: collapse;
+                background-color: $card-bg;
+                border-radius: 0.5rem;
+                overflow: hidden;   
+
+                th,
+                td {
+                    padding: 12px 24px;
+                    text-align: center;
+                }
+
+                thead {
+                    background-color: $color-primary-dark;
+                    font-weight: 600;
+                    font-size: 1.15rem;
+                    color: #fff;
+                }
+
+                tbody tr {
+                    border-bottom: 1px solid #e0e0e0;
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                }
+
+                td {
+                    color: #fff;
+                }
+            }
+
+            @media (max-width: 600px) {
+                table {
+                    font-size: 14px;
+
+                    th,
+                    td {
+                        padding: 10px 8px;
+                    }
+                }
+            }
+        }
     }
-  }
+}
+
+/* Breakpoints para responsividade */
+@media (max-width: 992px) {
+    // tablets
+    #classifier {
+        .classifier-content {
+            text-align: center;
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .classifier-card {
+                padding: 20px;
+            }
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    // mobile
+    #classifier {
+        .user-info {
+            font-size: 0.9rem;
+            top: 10px;
+            left: 10px;
+        }
+
+        .classifier-content {
+            text-align: center;
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .classifier-card {
+                padding: 15px;
+                width: 100%;
+            }
+        }
+    }
 }

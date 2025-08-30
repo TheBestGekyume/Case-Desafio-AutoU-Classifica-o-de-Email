@@ -4,6 +4,7 @@ import "./Home.scss";
 
 export default function Home() {
     const navigate = useNavigate();
+    const [userName, setUserName] = useState("");
     const [userEmail, setUserEmail] = useState("");
     const [error, setError] = useState("");
 
@@ -24,12 +25,17 @@ export default function Home() {
         }
 
         localStorage.setItem("userEmail", userEmail);
+        localStorage.setItem("userName", userName);
         navigate("/classifier");
     }
 
-    function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
+    function handleEmailChange(e: ChangeEvent<HTMLInputElement>) {
         setUserEmail(e.target.value);
         if (error) setError("");
+    }
+
+    function handleNameChange(e: ChangeEvent<HTMLInputElement>) {
+        setUserName(e.target.value);
     }
 
     return (
@@ -51,25 +57,40 @@ export default function Home() {
                     emails!
                 </p>
 
-                <div className="mb-4">
-                    <input
-                        type="email"
-                        className="emailInput mb-2"
-                        placeholder="Digite seu email"
-                        value={userEmail}
-                        onChange={handleInputChange}
-                        onKeyDown={(e) =>
-                            e.key === "Enter" && handleSaveUserEmail()
-                        }
-                    />
-                    {error && (
-                        <div className="text-danger fw-bold d-block">{error}</div>
-                    )}
-                </div>
+                <form className="mb-4 d-flex flex-column flex-md-row justify-content-center align-items-center gap-3 w-100">
+                    <div className="flex-fill">
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Digite seu nome"
+                            value={userName}
+                            onChange={handleNameChange}
+                            onKeyDown={(e) =>
+                                e.key === "Enter" && handleSaveUserEmail()
+                            }
+                        />
+                    </div>
 
-                <button
-                    onClick={handleSaveUserEmail}
-                >
+                    <div className="flex-fill">
+                        <input
+                            type="email"
+                            className="form-control"
+                            placeholder="Digite seu email"
+                            value={userEmail}
+                            onChange={handleEmailChange}
+                            onKeyDown={(e) =>
+                                e.key === "Enter" && handleSaveUserEmail()
+                            }
+                        />
+                        {error && (
+                            <div className="text-danger fw-bold mt-1">
+                                {error}
+                            </div>
+                        )}
+                    </div>
+                </form>
+
+                <button type="button" onClick={handleSaveUserEmail}>
                     Começar
                 </button>
             </main>

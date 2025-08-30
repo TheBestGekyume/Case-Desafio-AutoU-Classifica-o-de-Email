@@ -1,31 +1,39 @@
-interface ResultProps {
-  category: string | null;
-  confidence: number | null;
-  response: string | null;
+interface EmailResult {
+  subject: string;
+  message: string;
+  category: string;
+  response: string;
 }
 
-export default function Result({ category, confidence, response }: ResultProps) {
-  if (!category && !response) {
-    return null; // não renderiza nada até ter resultado
-  }
+interface ResultProps {
+  results: EmailResult[];
+}
+
+export default function Result({ results }: ResultProps) {
+  if (!results || results.length === 0) return null;
 
   return (
-    <div className="result">
-      {category && (
-        <div className="category">
-          Categoria: {category}
-        </div>
-      )}
-      {confidence !== null && (
-        <div className="confidence">
-          Confiança: {(confidence * 100).toFixed(2)}%
-        </div>
-      )}
-      {response && (
-        <div className="response">
-          Resposta sugerida: {response}
-        </div>
-      )}
+    <div className="result-table mt-5 mb-4">
+      <table>
+        <thead>
+          <tr>
+            <th>Assunto</th>
+            <th>Mensagem</th>
+            <th>Categoria</th>
+            <th>Resposta</th>
+          </tr>
+        </thead>
+        <tbody>
+          {results.map((res, index) => (
+            <tr key={index}>
+              <td>{res.subject}</td>
+              <td>{res.message}</td>
+              <td>{res.category}</td>
+              <td>{res.response}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
