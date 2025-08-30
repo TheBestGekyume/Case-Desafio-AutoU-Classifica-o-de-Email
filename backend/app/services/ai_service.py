@@ -8,19 +8,21 @@ logger = logging.getLogger(__name__)
 # Lê a chave diretamente
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-def classify_email(text: str):
+def classify_email(text: str, sender:str):
     logger.info(f"Chave Gemini disponível: {bool(GEMINI_API_KEY)}")
     
     # Tenta Gemini primeiro
-    gemini_response = gemini_classification(text)
+    gemini_response = gemini_classification(text, sender)
     if gemini_response:
-        return gemini_response
+        category, response_text = gemini_response
+        return category, response_text, "gemini"
     
     # Se Gemini falhar, usa fallback local
     logger.warning("Usando classificação fallback local!")
-    return classify_email_fallback(text)
+    category, response_text = classify_email_fallback(text)
+    return category, response_text, "fallback"
 
-def gemini_classification(text: str):
+def gemini_classification(text: str, sender:str):
     try:
         if not GEMINI_API_KEY:
             logger.warning("GEMINI_API_KEY não encontrada")
@@ -39,7 +41,6 @@ def gemini_classification(text: str):
             logger.warning(f"Modelo falhou: {str(model_error)}")
             return None
         
-        # Limita o tamanho do texto
         truncated_text = text[:3000] + "..." if len(text) > 3000 else text
         
         # Prompt para classificação
@@ -80,7 +81,7 @@ def gemini_classification(text: str):
         # Geração da resposta
         if category == "Produtivo":
             response_prompt = f"""
-            Você está respondendo diretamente esse email.
+            Você está respondendo diretamente esse email de {sender}.
             A resposta deve:
             - Não resolver o problema diretamente
             - Apenas informar que a mensagem foi recebida e encaminhada para a equipe responsável
@@ -93,10 +94,10 @@ def gemini_classification(text: str):
             """
         else:
             response_prompt = f"""
-            Você classificou o email como IMPRODUTIVO.
-            Gere uma resposta educada e breve (máximo 2 frases),
-            reconhecendo o recebimento, mas sem dar continuidade desnecessária
-            seja neutro.
+            Você classificou o email enviado por {sender} como IMPRODUTIVO.
+            Gere uma resposta educada e breve (máximo 2 frases);
+            Reconheça o recebimento, sem dar continuidade desnecessária;
+            seja neutro;
 
             Contexto do email: {truncated_text}
 
@@ -126,7 +127,7 @@ def gemini_classification(text: str):
         
         logger.info("Resposta gerada com sucesso pelo Gemini")
         
-        return category, response_text
+        return category, response_text;
         
     except Exception as e:
         logger.error(f"Erro detalhado no Gemini: {str(e)}")

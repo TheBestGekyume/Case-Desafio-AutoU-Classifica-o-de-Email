@@ -17,25 +17,25 @@ $border-radius: 0.5rem;
         top: 15px;
         left: 20px;
         display: flex;
-        gap: 0.5rem;
+        flex-direction: column;
         font-size: 1rem;
         color: $text-light;
         transition: 300ms;
         border-bottom: 1px solid transparent;
 
-        &:hover{
-          transform: translateY(6px);
-          border-bottom:1px solid #fff ;
+        &:hover {
+            transform: translateY(6px);
+            border-bottom: 1px solid #fff;
         }
 
-        svg{
-          fill: #000;
-          transition: 300ms;
-          cursor: pointer;
+        svg {
+            fill: #000;
+            transition: 300ms;
+            cursor: pointer;
 
-          &:hover{
-            fill: $text-light;
-          }
+            &:hover {
+                fill: $text-light;
+            }
         }
     }
 
@@ -72,6 +72,30 @@ $border-radius: 0.5rem;
                     font-size: 1.1rem;
                 }
 
+                .tab {
+                    border-bottom: 1px solid transparent;
+                    cursor: pointer;
+                    transition: 250ms;
+                }
+
+                .tab.active {
+                    border-bottom: 2px solid #007bff;
+                }
+
+                .tab-content {
+                    max-height: 0;
+                    opacity: 0;
+                    overflow: hidden;
+                    transform: translateY(-50px);
+                    transition: 400ms ease;
+                }
+
+                .tab-content.active {
+                    max-height: 250px;
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+
                 input,
                 textarea {
                     width: 100%;
@@ -81,6 +105,12 @@ $border-radius: 0.5rem;
                     background-color: lighten($card-bg, 5%);
                     color: #fff;
                     font-size: 1rem;
+                    transition: 300ms;
+
+                    &:focus{
+                        outline: none;
+                        background-color: darken($card-bg, 15%);
+                    }
                 }
 
                 input[type="file"] {
