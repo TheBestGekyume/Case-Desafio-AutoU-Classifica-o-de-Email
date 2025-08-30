@@ -107,7 +107,7 @@ $border-radius: 0.5rem;
                     font-size: 1rem;
                     transition: 300ms;
 
-                    &:focus{
+                    &:focus {
                         outline: none;
                         background-color: darken($card-bg, 15%);
                     }
@@ -129,6 +129,54 @@ $border-radius: 0.5rem;
                     &:hover {
                         transform: scale(1.05);
                         background-color: $color-primary-dark;
+                    }
+                }
+            }
+        }
+
+        .result-table {
+            overflow-x: auto;
+            width: 75%;
+
+            table {
+                border-collapse: collapse;
+                background-color: $card-bg;
+                border-radius: 0.5rem;
+                overflow: hidden;   
+
+                th,
+                td {
+                    padding: 12px 24px;
+                    text-align: center;
+                }
+
+                thead {
+                    background-color: $color-primary-dark;
+                    font-weight: 600;
+                    font-size: 1.15rem;
+                    color: #fff;
+                }
+
+                tbody tr {
+                    border-bottom: 1px solid #e0e0e0;
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                }
+
+                td {
+                    color: #fff;
+                }
+            }
+
+            @media (max-width: 600px) {
+                table {
+                    font-size: 14px;
+
+                    th,
+                    td {
+                        padding: 10px 8px;
                     }
                 }
             }
