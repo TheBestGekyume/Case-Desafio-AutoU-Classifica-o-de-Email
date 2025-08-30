@@ -23,11 +23,7 @@ export default function Form({ onClassify }: FormProps) {
 
     return (
         <form id="form" onSubmit={handleSubmit}>
-            <fieldset className="d-flex flex-column gap-1 mb-2">
-                <label htmlFor="recipient">Destinatario</label>
-                <input id="recipient" type="text" />
-            </fieldset>
-
+          
             <fieldset className="d-flex flex-column gap-1 mb-2">
                 <label htmlFor="subject">Assunto</label>
                 <input id="subject" type="text" />
