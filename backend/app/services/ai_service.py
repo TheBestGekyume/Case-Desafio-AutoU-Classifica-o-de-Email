@@ -1,8 +1,7 @@
 import logging
 import os
+import textwrap
 from .fallback_service import classify_email_fallback
-
-# Carrega variáveis de ambiente
 
 logger = logging.getLogger(__name__)
 
@@ -32,18 +31,12 @@ def gemini_classification(text: str):
         import google.generativeai as genai
         genai.configure(api_key=GEMINI_API_KEY)
         
-        
         try:
-            logger.info(f"Tentando modelo")
-            model = genai.GenerativeModel("gemini-2.5-flash")
-            logger.info(f"Modelo carregado com sucesso!")
-    
+            logger.info("Tentando modelo gemini-1.5-flash-latest")
+            model = genai.GenerativeModel("gemini-1.5-flash-latest")
+            logger.info("Modelo carregado com sucesso!")
         except Exception as model_error:
-                logger.warning(f"Modelo falhou: {str(model_error)}")
-                
-        
-        if not model:
-            logger.error("Todos os modelos Gemini falharam")
+            logger.warning(f"Modelo falhou: {str(model_error)}")
             return None
         
         # Limita o tamanho do texto
@@ -51,68 +44,86 @@ def gemini_classification(text: str):
         
         # Prompt para classificação
         classification_prompt = f"""
-        A sua UNICA tarefa agora é classificar este email.
+        Você trabalha em uma empresa de tecnologia.  
+        Os emails recebidos podem ser internos (entre colegas) ou externos (de clientes).  
+
+        Classes possíveis:  
+        - "Produtivo": São mensagens que pedem suporte, resolução de problemas, dúvidas de clientes, solicitações diretas, ou informações que exigem acompanhamento.  
+        - "Improdutivo": São mensagens de propaganda, spam, promoções, cumprimentos, agradecimentos, convites, ou qualquer mensagem que NÃO exige resposta ou ação real. 
+
         Email: {truncated_text}
 
-        Classifique este email como "Produtivo" ou "Improdutivo"
-
-        - "Produtivo": Email que REQUER ação, resposta ou solução (ex: problemas técnicos, dúvidas, solicitações de suporte, pedidos de ajuda, questões urgentes)
-        - "Improdutivo": Email que NÃO REQUER ação imediata (ex: agradecimentos, cumprimentos, confirmações, mensagens sociais, felicitações)
-        
-        EXEMPLOS:
-        - "Olá, estou com erro no sistema" = Produtivo
-        - "Obrigado pela ajuda!" = Improdutivo  
-        - "Como resetar minha senha?" = Produtivo
-        - "Parabéns pelo trabalho!" = Improdutivo
-        - "Preciso de suporte técnico" = Produtivo
-        - "Só queria agradecer" = Improdutivo
-        
-        Responda APENAS com uma palavra: "Produtivo" ou "Improdutivo".
+        Responda APENAS com "Produtivo" ou "Improdutivo".
         """
         
         logger.info("Enviando requisição para classificação...")
         response = model.generate_content(
             classification_prompt,
             generation_config=genai.types.GenerationConfig(
-                temperature=0.3,
+                temperature=0.1,
                 max_output_tokens=10,
             )
         )
         
-        category = response.text.strip()
-        logger.info(f"Resposta bruta do Gemini: '{category}'")
-        
-        # Normaliza a categoria
-        if "produtivo" in category.lower():
-            category = "Produtivo"
-        elif "improdutivo" in category.lower():
-            category = "Improdutivo"
+        if hasattr(response, 'text'):
+            category = response.text.strip()
+        elif hasattr(response, 'parts') and response.parts:
+            category = response.parts[0].text.strip()
+        elif hasattr(response, 'candidates') and response.candidates:
+            category = response.candidates[0].content.parts[0].text.strip()
         else:
-            logger.warning(f"Resposta inesperada do Gemini: {category}")
+            logger.error("Não foi possível extrair texto da resposta")
             return None
         
-        logger.info(f"Categoria normalizada: {category}")
-        
+        logger.info(f"Resposta bruta do Gemini: '{category}'")
+                
         # Geração da resposta
-        response_prompt = f"""
-        Gere uma resposta profissional breve para um email classificado como {category}.
-        Seja direto e educado (máximo 2 frases).
-        
-        Contexto do email: {truncated_text}
-        
-        Resposta:
-        """
+        if category == "Produtivo":
+            response_prompt = f"""
+            Você está respondendo diretamente esse email.
+            A resposta deve:
+            - Não resolver o problema diretamente
+            - Apenas informar que a mensagem foi recebida e encaminhada para a equipe responsável
+            - Ser educada e profissional
+            - Ter no máximo 1 ou 2 frases
+
+            Email: {truncated_text}
+
+            Resposta:
+            """
+        else:
+            response_prompt = f"""
+            Você classificou o email como IMPRODUTIVO.
+            Gere uma resposta educada e breve (máximo 2 frases),
+            reconhecendo o recebimento, mas sem dar continuidade desnecessária
+            seja neutro.
+
+            Contexto do email: {truncated_text}
+
+            Resposta:
+            """
+
+        response_prompt = textwrap.dedent(response_prompt)
         
         logger.info("Enviando requisição para gerar resposta...")
         response2 = model.generate_content(
             response_prompt,
             generation_config=genai.types.GenerationConfig(
                 temperature=0.7,
-                max_output_tokens=150,
+                max_output_tokens=100,
             )
         )
         
-        response_text = response2.text.strip()
+        # CORREÇÃO: Acessa a resposta corretamente
+        if hasattr(response2, 'text'):
+            response_text = response2.text.strip()
+        elif hasattr(response2, 'parts') and response2.parts:
+            response_text = response2.parts[0].text.strip()
+        elif hasattr(response2, 'candidates') and response2.candidates:
+            response_text = response2.candidates[0].content.parts[0].text.strip()
+        else:
+            response_text = "Olá! Agradecemos seu contato."
+        
         logger.info("Resposta gerada com sucesso pelo Gemini")
         
         return category, response_text
