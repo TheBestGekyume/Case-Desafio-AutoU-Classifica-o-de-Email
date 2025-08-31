@@ -1,86 +1,71 @@
 import logging
+import random
 import re
 
 logger = logging.getLogger(__name__)
 
-# Sistema de fallback local baseado em análise de palavras-chave
+PRODUCTIVE_KEYWORDS = {
+    'problema': 3, 'erro': 3, 'bug': 3, 'falha': 2, 'suporte': 3,
+    'não funciona': 2, 'quebrado': 2, 'queimado': 2, 'ajuda': 2, 'urgente': 2,
+    'socorro': 1, 'importante': 1, 'dúvida': 1, 'questão': 1, 'pergunta': 1,
+    'como fazer': 1, 'tutorial': 1, 'solicitação': 1, 'pedido': 1,
+    'requisição': 1, 'demanda': 1, 'tarefa': 1, 'conserto': 1, 'reparo': 1,
+    'corrigir': 1, 'resolver': 1, 'solucionar': 1, 'acesso': 1, 'login': 1,
+    'senha': 1, 'conta': 1, 'sistema': 1, 'aplicativo': 1, 'técnico': 1,
+    'assistência': 1, 'orientação': 1, 'instrução': 1
+}
 
-def classify_email_fallback(text: str):
+UNPRODUCTIVE_KEYWORDS = {
+    'parabéns': 3, 'beijo': 3, 'abraço': 2, 'promoção': 2, 'carinhosamente': 2,
+    'oferta': 2, 'obrigado': 1, 'congratulações': 1, 'felicitações': 1,
+    'cumprimentos': 1, 'saudações': 1, 'cordialmente': 1, 'respeitosamente': 1,
+    'obrigada': 1, 'abração': 1,  'gratidão': 1, 'grato': 1, 'comemoração': 1,
+    'confirmado': 1, 'recebido': 1, 'confirmação': 1, 'agradeço': 1
+}
+
+QUESTION_PATTERN = re.compile(r'\b(como|porque|por que|qual|quando|onde)\b|\?', re.IGNORECASE)
+THANKS_PATTERN = re.compile(r'\b(obrigad[oa]|agradeço|grato)\b', re.IGNORECASE)
+
+def classify_email_fallback(text: str, sender: str):
     try:
-        truncated_text = text[:1500] + "..." if len(text) > 1500 else text
-        text_lower = truncated_text.lower()
-        
-        productive_keywords = [
-            'problema', 'erro', 'bug', 'falha', 'não funciona', 'quebrado',
-            'ajuda', 'suporte', 'socorro', 'urgente', 'importante',
-            'dúvida', 'questão', 'pergunta', 'como fazer', 'tutorial',
-            'solicitação', 'pedido', 'requisição', 'demanda', 'tarefa',
-            'conserto', 'reparo', 'corrigir', 'resolver', 'solucionar',
-            'acesso', 'login', 'senha', 'conta', 'sistema', 'aplicativo',
-            'técnico', 'assistência', 'orientação', 'instrução'
-        ]
-        
-        unproductive_keywords = [
-            'obrigado', 'obrigada', 'agradeço', 'grato', 'gratidão',
-            'parabéns', 'congratulações', 'felicitações', 'comemoração',
-            'cumprimentos', 'saudações', 'atenciosamente', 'cordialmente', 
-            'respeitosamente','abraço', 'abração', 'beijo', 'carinhosamente',
-            'confirmado', 'recebido', 'confirmação'
-        ]
-        
-        productive_score = 0
-        unproductive_score = 0
-        
-        for word in productive_keywords:
-            if word in text_lower:
-                productive_score += 1
-                if word in ['problema', 'erro', 'bug', 'urgente', 'suporte', 'requisição', 'ajuda']:
-                    productive_score += 2
-        
-        for word in unproductive_keywords:
-            if word in text_lower:
-                unproductive_score += 1
-                if word in ['obrigado', 'parabéns', 'agradeço']:
-                    unproductive_score += 2
-        
-        has_question = bool(re.search(r'\?|como|porque|por que|qual|quando|onde', text_lower))
-        has_thanks = bool(re.search(r'obrigad[oa]|agradeço|grato', text_lower))
-        
-        if has_question:
+        text_lower = text.lower()
+        productive_score = sum(weight for kw, weight in PRODUCTIVE_KEYWORDS.items() if kw in text_lower)
+        unproductive_score = sum(weight for kw, weight in UNPRODUCTIVE_KEYWORDS.items() if kw in text_lower)
+
+        if QUESTION_PATTERN.search(text_lower):
             productive_score += 3
-        if has_thanks:
-            unproductive_score += 2
-        
+        if THANKS_PATTERN.search(text_lower):
+            unproductive_score += 1
+
         if productive_score > unproductive_score:
             category = "Produtivo"
-            response_text = generate_productive_response(text_lower)
         else:
             category = "Improdutivo"
-            response_text = generate_unproductive_response(text_lower)
-        
+
+        response_text = generate_response(category, text, sender)
         logger.info(f"Fallback: {category} (P: {productive_score}, I: {unproductive_score})")
         return category, response_text
 
     except Exception as e:
         logger.error(f"Erro no fallback: {str(e)}")
-        return "Produtivo", "Olá! Recebemos sua mensagem e retornaremos em breve."
+        return "Produtivo", f"Olá {sender}! Recebemos sua mensagem e retornaremos em breve."
 
-def generate_productive_response(text: str) -> str:
-    responses = [
-        "Olá! Obrigado por entrar em contato. Nossa equipe analisará sua solicitação e retornará em breve.",
-        "Prezado, agradecemos seu contato. Estamos analisando sua questão e retornaremos em até 24h.",
-        "Olá! Recebemos sua solicitação. Nossa equipe técnica já está verificando e em breve teremos uma solução.",
+def generate_response(category: str, text: str, sender: str) -> str:
+    productive_responses = [
+        f"Olá {sender}! Obrigado por entrar em contato. Nossa equipe analisará sua solicitação e retornará em breve.",
+        f"Prezado {sender}, agradecemos seu contato. Estamos analisando sua questão e retornaremos em até 24h.",
+        f"Olá {sender}! Recebemos sua solicitação. Nossa equipe técnica já está verificando e em breve teremos uma solução.",
         "Obrigado pelo seu email. Estamos processando sua requisição e retornaremos com informações em breve.",
-        "Olá! Sua mensagem foi recebida. Nossa equipe de suporte entrará em contato para resolver sua questão."
+        f"Olá {sender}! Sua mensagem foi recebida. Nossa equipe de suporte entrará em contato para resolver sua questão."
     ]
-    return responses[len(text) % len(responses)]
 
-def generate_unproductive_response(text: str) -> str:
-    responses = [
-        "Olá! Agradecemos seu contato e sua mensagem foi recebida com sucesso.",
+    unproductive_responses = [
+        f"Olá {sender}! Agradecemos seu contato e sua mensagem foi recebida com sucesso.",
         "Obrigado por seu email! Apreciamos seu contato e retornaremos se necessário.",
-        "Olá! Recebemos sua mensagem. Agradecemos pelo contato e feedback.",
+        f"Olá {sender}! Recebemos sua mensagem. Agradecemos pelo contato e feedback.",
         "Obrigado por entrar em contato! Sua mensagem foi registrada em nosso sistema.",
-        "Olá! Agradecemos sua comunicação. Ficamos contentes com seu contato."
+        f"Olá {sender}! Agradecemos sua comunicação. Ficamos contentes com seu contato."
     ]
-    return responses[len(text) % len(responses)]
+
+    responses = productive_responses if category == "Produtivo" else unproductive_responses
+    return random.choice(responses)

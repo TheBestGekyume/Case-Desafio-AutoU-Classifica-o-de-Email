@@ -1,4 +1,4 @@
-interface EmailResult {
+interface Emails {
   subject: string;
   message: string;
   category: string;
@@ -6,7 +6,7 @@ interface EmailResult {
 }
 
 interface ResultProps {
-  results: EmailResult[];
+  results: Emails[];
 }
 
 export default function Result({ results }: ResultProps) {
@@ -25,10 +25,21 @@ export default function Result({ results }: ResultProps) {
         </thead>
         <tbody>
           {results.map((res, index) => (
+            
             <tr key={index}>
               <td>{res.subject}</td>
               <td>{res.message}</td>
-              <td>{res.category}</td>
+              <td>
+                <span
+                  className={`category ${
+                    res.category.toLowerCase() === "produtivo"
+                      ? "produtivo"
+                      : "improdutivo"
+                  }`}
+                >
+                  {res.category}                 
+                </span>
+              </td>
               <td>{res.response}</td>
             </tr>
           ))}
