@@ -28,8 +28,6 @@ QUESTION_PATTERN = re.compile(r'\b(como|porque|por que|qual|quando|onde)\b|\?', 
 THANKS_PATTERN = re.compile(r'\b(obrigad[oa]|agradeço|grato)\b', re.IGNORECASE)
 
 def classify_email_fallback(text: str, sender: str):
-    # logger.error("texto limpo: "+text)
-
     try:
         SPAM_STRONG_KEYWORDS = ["ganhe dinheiro", "fique milionário", "fique rico",
         "dinheiro fácil", "investimento garantido", "promoção imperdível",

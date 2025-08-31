@@ -24,7 +24,7 @@ export default function Result({ results }: ResultProps) {
           </tr>
         </thead>
         <tbody>
-          {results.map((res, index) => (
+          {results.slice().reverse().map((res, index) => (
             
             <tr key={index}>
               <td>{res.subject}</td>
