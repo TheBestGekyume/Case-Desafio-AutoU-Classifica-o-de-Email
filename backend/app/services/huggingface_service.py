@@ -11,7 +11,6 @@ def huggingface_classification(text: str, sender: str):
     try:
         logger.info(f"Classificando com Hugging Face")
         
-        # 1. Classificação do email usando chat completions
         classification_prompt = f"""
         Você trabalha em uma empresa de tecnologia.  
         Classifique este email em "Produtivo" ou "Improdutivo":
@@ -40,7 +39,7 @@ def huggingface_classification(text: str, sender: str):
         logger.info(f"Categoria classificada: '{category}'")
 
         # 2. Gera a resposta baseada na categoria
-        response_text = generate_response_with_hf(category, sender, text)
+        response_text = generate_response(category, sender, text)
 
         return category, response_text
 
@@ -58,7 +57,7 @@ def extract_category(response: str) -> str:
     else:
         return "ERROR"
 
-def generate_response_with_hf(category: str, sender: str, text: str) -> str:
+def generate_response(category: str, sender: str, text: str) -> str:
     logger.info("SENDER = " + sender)
     if category == "Produtivo":
         prompt = f"""

@@ -61,7 +61,7 @@ def extract_sender(text: str) -> str:
 def extract_subject(text: str) -> str:
     """Extrai o assunto do texto usando padrões comuns"""
     patterns = [
-        r'Assunto:\s*(.+?)(?=\n\w+:|$)',  # Captura até o próximo campo ou fim
+        r'Assunto:\s*(.+?)(?=\n\w+:|$)',
         r'Subject:\s*(.+?)(?=\n\w+:|$)',
         r'Título:\s*(.+?)(?=\n\w+:|$)',
         r'Title:\s*(.+?)(?=\n\w+:|$)'
@@ -71,23 +71,19 @@ def extract_subject(text: str) -> str:
         match = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
         if match:
             subject = match.group(1).strip()
-            # Remove quebras de linha excessivas
             subject = re.sub(r'\s+', ' ', subject)
             return subject
     
-    # Se não encontrar padrão, tenta pegar múltiplas linhas após "Assunto:"
     subject_match = re.search(r'Assunto:\s*(.+?)(?=\n\s*\n|\n\w+:|$)', text, re.IGNORECASE | re.DOTALL)
     if subject_match:
         subject = subject_match.group(1).strip()
         subject = re.sub(r'\s+', ' ', subject)
         return subject
     
-    # Se não encontrar padrão, pega a primeira linha que parece ser um assunto
     lines = text.split('\n')
     for i, line in enumerate(lines):
         line = line.strip()
         if line and len(line) < 100 and not line.lower().startswith(('remetente', 'from', 'de', 'sender')):
-            # Verifica se a próxima linha também faz parte do assunto
             if i + 1 < len(lines) and lines[i + 1].strip() and not lines[i + 1].strip().startswith(('Mensagem', 'Message')):
                 return f"{line} {lines[i + 1].strip()}"
             return line

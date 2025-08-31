@@ -39,7 +39,7 @@ def clean_text(text: str, character_limit=3000) -> str:
         limit = character_limit - len("...[texto truncado]")
         processed_text = processed_text[:limit].rsplit(" ", 1)[0] + "...[texto truncado]"
 
-    logger.info(f"Texto limpo: {processed_text[:200]}...")
+    logger.error(f"Texto limpo: {processed_text[:200]}...")
     return processed_text
 
 
