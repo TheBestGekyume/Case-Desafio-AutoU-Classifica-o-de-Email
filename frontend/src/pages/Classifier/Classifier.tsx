@@ -34,7 +34,6 @@ export default function Classifier() {
 
     const handleClassify = useCallback(
         async (data: File | { subject: string; message: string }) => {
-
             const formData = new FormData();
 
             let subject = "";
@@ -50,18 +49,25 @@ export default function Classifier() {
                 formData.append("sender", userName!);
             }
 
-
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/classify", {
-                    method: "POST",
-                    body: formData,
-                });
-                if (!response.ok) throw new Error(`Erro: ${response.statusText}`);
+                const response = await fetch(
+                    "http://127.0.0.1:8000/api/classify",
+                    {
+                        method: "POST",
+                        body: formData,
+                    }
+                );
+                if (!response.ok)
+                    throw new Error(`Erro: ${response.statusText}`);
                 const json = await response.json();
 
                 const newResult: Emails = {
                     subject: subject || (data instanceof File ? data.name : ""),
-                    message: message || (data instanceof File ? "Não é possivel ler a mensagem do arquivo" : ""),
+                    message:
+                        message ||
+                        (data instanceof File
+                            ? "Não é possivel ler a mensagem do arquivo"
+                            : ""),
                     category: json.category,
                     response: json.response,
                 };

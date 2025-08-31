@@ -6,10 +6,7 @@ logger = logging.getLogger(__name__)
 
 def gemini_classification(text: str, sender: str):
     try:
-        if not GEMINI_API_KEY:
-            logger.warning("GEMINI_API_KEY não encontrada")
-            return None
-        
+            
         logger.info("Tentando conectar com Gemini...")
         
         genai.configure(api_key=GEMINI_API_KEY)
@@ -23,7 +20,6 @@ def gemini_classification(text: str, sender: str):
             return None
                 
         
-        # Prompt para classificação
         classification_prompt = f"""
         Você trabalha em uma empresa de tecnologia.  
         Classifique este email em "Produtivo" ou "Improdutivo":
@@ -38,7 +34,7 @@ def gemini_classification(text: str, sender: str):
         """
         
         logger.info("Enviando requisição para classificação...")
-        response = model.generate_content(
+        classification_response = model.generate_content(
             classification_prompt,
             generation_config=genai.types.GenerationConfig(
                 temperature=0.2,
@@ -47,11 +43,10 @@ def gemini_classification(text: str, sender: str):
         )
         
         # Extrai a categoria da resposta
-        category = extract_response_text(response).strip()
+        category = extract_response(classification_response).strip()
         
         logger.info(f"Categoria classificada: '{category}'")
         
-        # Gera resposta apropriada
         response_text = generate_response(category, sender, text, model)
         
         return category, response_text
@@ -61,7 +56,7 @@ def gemini_classification(text: str, sender: str):
         logger.error(f"Tipo do erro: {type(e).__name__}")
         return None
 
-def extract_response_text(response):
+def extract_response(response):
     if hasattr(response, 'text'):
         return response.text
     elif hasattr(response, 'parts') and response.parts:
@@ -100,4 +95,4 @@ def generate_response(category: str, sender: str, text: str, model):
         )
     )
     
-    return extract_response_text(response).strip()
+    return extract_response(response).strip()

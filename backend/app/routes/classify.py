@@ -15,7 +15,6 @@ async def classify_email_route(
     file: Optional[UploadFile] = File(None)
 ):
     try:
-        # Extrai conteúdo de arquivo se houver
         file_text = ""
         if file and file.filename:
             file_text, extracted_sender, extracted_subject, extracted_message = await extract_file_content(file)
@@ -24,17 +23,14 @@ async def classify_email_route(
             message = message or extracted_message
             file_text = file_text
 
-        # Valida entrada
         if not file_text and (not subject or not message):
             raise HTTPException(
                 status_code=400,
                 detail="Envie um arquivo ou preencha subject e message."
             )
 
-        # Monta o texto final
         full_text = file_text if file_text else f"\nAssunto: {subject}\nMensagem: {message}"
 
-        # Chama serviço centralizado
         category, response_text, source = classify_email(full_text, sender)
 
         return {
