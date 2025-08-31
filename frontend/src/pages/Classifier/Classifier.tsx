@@ -16,6 +16,8 @@ export default function Classifier() {
     const [userEmail, setUserEmail] = useState<string | null>(null);
     const [userName, setUserName] = useState<string | null>(null);
     const [results, setResults] = useState<Emails[]>([]);
+    const apiUrl =
+        "https://case-desafio-autou-classifica-o-de-email.onrender.com/api/classify";
 
     useEffect(() => {
         const email = localStorage.getItem("userEmail");
@@ -50,13 +52,10 @@ export default function Classifier() {
             }
 
             try {
-                const response = await fetch(
-                    "http://127.0.0.1:8000/api/classify",
-                    {
-                        method: "POST",
-                        body: formData,
-                    }
-                );
+                const response = await fetch(apiUrl, {
+                    method: "POST",
+                    body: formData,
+                });
                 if (!response.ok)
                     throw new Error(`Erro: ${response.statusText}`);
                 const json = await response.json();
