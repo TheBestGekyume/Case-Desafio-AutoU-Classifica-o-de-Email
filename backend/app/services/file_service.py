@@ -32,7 +32,6 @@ async def extract_file_content(file: UploadFile) -> tuple[str, str, str, str]:
         message = extract_message(full_text)
 
         logger.info(f"Extraído do arquivo - Remetente: {sender}, Assunto: {subject}")
-        logger.info(f"Tamanho da mensagem: {len(message) if message else 0} caracteres")
 
         return full_text, sender, subject, message
 

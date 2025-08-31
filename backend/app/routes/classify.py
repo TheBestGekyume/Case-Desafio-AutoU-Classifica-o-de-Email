@@ -32,7 +32,7 @@ async def classify_email_route(
             )
 
         # Monta o texto final
-        full_text = file_text if file_text else f"Remetente: {sender}\nAssunto: {subject}\nMensagem: {message}"
+        full_text = file_text if file_text else f"\nAssunto: {subject}\nMensagem: {message}"
 
         # Chama serviço centralizado
         category, response_text, source = classify_email(full_text, sender)
@@ -43,7 +43,6 @@ async def classify_email_route(
             "source": source,
             "sender": sender,
             "subject": subject,
-            "text_length": len(full_text)
         }
 
     except Exception as e:

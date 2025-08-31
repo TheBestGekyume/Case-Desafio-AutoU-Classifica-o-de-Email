@@ -1,47 +1,53 @@
 import logging
 import string
 import re
-import nltk
-from nltk.corpus import stopwords
+import spacy
 from ..config import GEMINI_API_KEY, HF_API_KEY
 from .gemini_service import gemini_classification
 from .huggingface_service import huggingface_classification
 from .fallback_service import classify_email_fallback
+from unidecode import unidecode
 
 logger = logging.getLogger(__name__)
 
 try:
-    stop_words = set(stopwords.words("portuguese"))
-except LookupError:
-    nltk.download("stopwords")
-    stop_words = set(stopwords.words("portuguese"))
-
+    nlp = spacy.load("pt_core_news_sm")
+except OSError:
+    import subprocess
+    subprocess.run(["python", "-m", "spacy", "download", "pt_core_news_sm"])
+    nlp = spacy.load("pt_core_news_sm")
 
 def clean_text(text: str, character_limit=3000) -> str:
+   
     if not text or not isinstance(text, str):
         return ""
 
     processed_text = text.lower()
+
+    processed_text = unidecode(processed_text)
+    
     processed_text = processed_text.translate(str.maketrans("", "", string.punctuation))
+
     processed_text = re.sub(r"\s+", " ", processed_text).strip()
-    words = [w for w in processed_text.split() if w not in stop_words]
-    processed_text = " ".join(words)
+
+    if nlp:
+        doc = nlp(processed_text)
+        words = [token.lemma_ for token in doc]
+        processed_text = " ".join(words)
 
     if len(processed_text) > character_limit:
         limit = character_limit - len("...[texto truncado]")
         processed_text = processed_text[:limit].rsplit(" ", 1)[0] + "...[texto truncado]"
 
-    logger.debug(f"Texto limpo: {processed_text[:200]}...")
+    logger.info(f"Texto limpo: {processed_text[:200]}...")
     return processed_text
 
-# ---------------------
-# Função principal
-# ---------------------
+
+
 def classify_email(text: str, sender: str):
     
-    logger.info(f"Iniciando classificação - Texto: {len(text)} chars, Remetente: {sender}")
+    logger.info(f"Iniciando classificação")
 
-    # Limpa e prepara o texto
     clean_input = clean_text(text)
 
     logger.info(f"Gemini API disponível: {bool(GEMINI_API_KEY)}")

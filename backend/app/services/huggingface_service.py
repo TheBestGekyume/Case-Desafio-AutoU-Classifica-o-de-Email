@@ -9,7 +9,7 @@ client = InferenceClient(token=HF_API_KEY)
 
 def huggingface_classification(text: str, sender: str):
     try:
-        logger.info(f"Classificando com Hugging Face - Texto: {len(text)} chars")
+        logger.info(f"Classificando com Hugging Face")
         
         # 1. Classificação do email usando chat completions
         classification_prompt = f"""
@@ -26,7 +26,7 @@ def huggingface_classification(text: str, sender: str):
         """
         
         classification_response = client.chat.completions.create(
-            model="distilbert-base-uncased-finetuned-sst-2-english",
+            model="HuggingFaceH4/zephyr-7b-beta",
             messages=[
                 {"role": "system", "content": "Você é um classificador de e-mails."},
                 {"role": "user", "content": classification_prompt}
