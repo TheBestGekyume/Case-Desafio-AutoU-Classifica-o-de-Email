@@ -1,17 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-import logging
-import os
 
-
-# Configuração de logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Carrega variáveis de ambiente
 load_dotenv()
-
 
 from app.routes import classify
 

@@ -5,36 +5,48 @@ import re
 logger = logging.getLogger(__name__)
 
 PRODUCTIVE_KEYWORDS = {
-    'problema': 3, 'erro': 3, 'bug': 3, 'falha': 2, 'suporte': 3,
-    'não funciona': 2, 'quebrado': 2, 'queimado': 2, 'ajuda': 2, 'urgente': 2,
-    'socorro': 1, 'importante': 1, 'dúvida': 1, 'questão': 1, 'pergunta': 1,
-    'como fazer': 1, 'tutorial': 1, 'solicitação': 1, 'pedido': 1,
-    'requisição': 1, 'demanda': 1, 'tarefa': 1, 'conserto': 1, 'reparo': 1,
+    'problema': 3, 'erro': 3, 'bug': 3, 'suporte': 3, 'falha': 2,
+    'nao funciona': 2, 'quebrado': 2, 'queimado': 2, 'ajuda': 2, 'urgente': 2,
+    'projeto': 1, 'socorro': 1, 'importante': 1, 'duvida': 1, 'questao': 1,
+    'pergunta': 1, 'como fazer': 1, 'tutorial': 1, 'solicitacao': 1, 'pedido': 1,
+    'requisicao': 1, 'demanda': 1, 'tarefa': 1, 'conserto': 1, 'reparo': 1,
     'corrigir': 1, 'resolver': 1, 'solucionar': 1, 'acesso': 1, 'login': 1,
-    'senha': 1, 'conta': 1, 'sistema': 1, 'aplicativo': 1, 'técnico': 1,
-    'assistência': 1, 'orientação': 1, 'instrução': 1
+    'senha': 1, 'conta': 1, 'sistema': 1, 'aplicativo': 1, 'tecnico': 1,
+    'assistencia': 1, 'orientacao': 1, 'instrucao': 1, 'reuniao': 1
 }
 
 UNPRODUCTIVE_KEYWORDS = {
-    'parabéns': 3, 'beijo': 3, 'abraço': 2, 'promoção': 2, 'carinhosamente': 2,
-    'oferta': 2, 'obrigado': 1, 'congratulações': 1, 'felicitações': 1,
-    'cumprimentos': 1, 'saudações': 1, 'cordialmente': 1, 'respeitosamente': 1,
-    'obrigada': 1, 'abração': 1,  'gratidão': 1, 'grato': 1, 'comemoração': 1,
-    'confirmado': 1, 'recebido': 1, 'confirmação': 1, 'agradeço': 1
+    'parabens': 3, 'beijo': 3, 'abraco': 2, 'promocao': 2, 'carinhosamente': 2,
+    'oferta': 2, 'festa': 2, 'aniversario': 2, 'obrigado': 1, 'congratulacoes': 1,
+    'felicitacoes': 1, 'cumprimentos': 1, 'saudacoes': 1, 'cordialmente': 1,
+    'respeitosamente': 1, 'obrigada': 1, 'abracao': 1, 'gratidão': 1, 'grato': 1,
+    'comemoracao': 1, 'confirmado': 1, 'recebido': 1, 'confirmacao': 1, 'agradeco': 1,
 }
+
 
 QUESTION_PATTERN = re.compile(r'\b(como|porque|por que|qual|quando|onde)\b|\?', re.IGNORECASE)
 THANKS_PATTERN = re.compile(r'\b(obrigad[oa]|agradeço|grato)\b', re.IGNORECASE)
 
 def classify_email_fallback(text: str, sender: str):
-    try:
-        text_lower = text.lower()
-        productive_score = sum(weight for kw, weight in PRODUCTIVE_KEYWORDS.items() if kw in text_lower)
-        unproductive_score = sum(weight for kw, weight in UNPRODUCTIVE_KEYWORDS.items() if kw in text_lower)
+    # logger.error("texto limpo: "+text)
 
-        if QUESTION_PATTERN.search(text_lower):
-            productive_score += 3
-        if THANKS_PATTERN.search(text_lower):
+    try:
+        SPAM_STRONG_KEYWORDS = ["ganhe dinheiro", "fique milionário", "fique rico",
+        "dinheiro fácil", "investimento garantido", "promoção imperdível",
+        "oferta exclusiva", "faça fortuna", "multiplique seu dinheiro", 
+        "aposta", "pix premiado", "pix milionário", "desconto relâmpago",
+        "emagreça rápido", "cura milagrosa"]
+        if any(word in text for word in SPAM_STRONG_KEYWORDS):
+            category = "Improdutivo"
+            response_text = generate_response(category, text, sender)
+            return category, response_text
+
+        productive_score = sum(weight for kw, weight in PRODUCTIVE_KEYWORDS.items() if kw in text)
+        unproductive_score = sum(weight for kw, weight in UNPRODUCTIVE_KEYWORDS.items() if kw in text)
+
+        if QUESTION_PATTERN.search(text):
+            productive_score += 1
+        if THANKS_PATTERN.search(text):
             unproductive_score += 1
 
         if productive_score > unproductive_score:
