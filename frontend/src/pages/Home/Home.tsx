@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import logoImg from "../../../public/logo_autoU.png"
 import "./home.scss";
 
 export default function Home() {
@@ -45,7 +46,7 @@ export default function Home() {
         >
             <header className="mb-3">
                 <img
-                    src="/src/assets/logo_autoU.png"
+                    src={logoImg}
                     alt="Logo"
                     className="logo"
                 />
