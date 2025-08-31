@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Home.scss";
+import "./home.scss";
 
 export default function Home() {
     const navigate = useNavigate();
