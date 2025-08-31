@@ -7,8 +7,6 @@ logger = logging.getLogger(__name__)
 
 def classify_email_fallback(text: str):
     try:
-        truncated_text = text[:1500] + "..." if len(text) > 1500 else text
-        text_lower = truncated_text.lower()
         
         productive_keywords = [
             'problema', 'erro', 'bug', 'falha', 'não funciona', 'quebrado',
@@ -32,19 +30,19 @@ def classify_email_fallback(text: str):
         unproductive_score = 0
         
         for word in productive_keywords:
-            if word in text_lower:
+            if word in text:
                 productive_score += 1
                 if word in ['problema', 'erro', 'bug', 'urgente', 'suporte', 'requisição', 'ajuda']:
                     productive_score += 2
         
         for word in unproductive_keywords:
-            if word in text_lower:
+            if word in text:
                 unproductive_score += 1
                 if word in ['obrigado', 'parabéns', 'agradeço']:
                     unproductive_score += 2
         
-        has_question = bool(re.search(r'\?|como|porque|por que|qual|quando|onde', text_lower))
-        has_thanks = bool(re.search(r'obrigad[oa]|agradeço|grato', text_lower))
+        has_question = bool(re.search(r'\?|como|porque|por que|qual|quando|onde', text))
+        has_thanks = bool(re.search(r'obrigad[oa]|agradeço|grato', text))
         
         if has_question:
             productive_score += 3
@@ -53,10 +51,10 @@ def classify_email_fallback(text: str):
         
         if productive_score > unproductive_score:
             category = "Produtivo"
-            response_text = generate_productive_response(text_lower)
+            response_text = generate_productive_response(text)
         else:
             category = "Improdutivo"
-            response_text = generate_unproductive_response(text_lower)
+            response_text = generate_unproductive_response(text)
         
         logger.info(f"Fallback: {category} (P: {productive_score}, I: {unproductive_score})")
         return category, response_text

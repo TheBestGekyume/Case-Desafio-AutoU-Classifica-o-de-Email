@@ -1,6 +1,4 @@
 import logging
-import os
-import textwrap
 import google.generativeai as genai
 from ..config import GEMINI_API_KEY
 
@@ -23,8 +21,7 @@ def gemini_classification(text: str, sender: str):
         except Exception as model_error:
             logger.warning(f"Modelo falhou: {str(model_error)}")
             return None
-        
-        truncated_text = text[:3000] + "..." if len(text) > 3000 else text
+                
         
         # Prompt para classificação
         classification_prompt = f"""
@@ -35,7 +32,7 @@ def gemini_classification(text: str, sender: str):
         - Produtivo: Pedidos de suporte, resolução de problemas, dúvidas técnicas, solicitações que exigem ação.
         - Improdutivo: Spam, promoções, newsletters, cumprimentos, agradecimentos, sem ação necessária.
 
-        Email: {truncated_text}
+        Email: {text}
 
         Responda APENAS com "Produtivo" ou "Improdutivo".
         """
@@ -55,7 +52,7 @@ def gemini_classification(text: str, sender: str):
         logger.info(f"Categoria classificada: '{category}'")
         
         # Gera resposta apropriada
-        response_text = generate_response(category, sender, truncated_text, model)
+        response_text = generate_response(category, sender, text, model)
         
         return category, response_text
         
@@ -82,12 +79,17 @@ def generate_response(category: str, sender: str, text: str, model):
         - Foi encaminhada para a equipe responsável
         - Serão tomadas providências
         - Seja breve (1-2 frases)
+        Contexto: {text}
         """
     else:
         prompt = f"""
-        Gere uma resposta educada para {sender} agradecendo o contato,
-        mas sem comprometer com ações desnecessárias.
-        Seja neutro e breve (1-2 frases).
+        Você é um funcionario de uma empresa de tecnologia
+        esse email improdutivo:{text}
+
+        Gere uma resposta profissional para {sender}.
+        Seja neutro e breve (1 frases).
+        Não aceite ou recuse nada.
+        Lembre-se, você esta respondendo pela empresa, não por você mesmo.
         """
     
     response = model.generate_content(

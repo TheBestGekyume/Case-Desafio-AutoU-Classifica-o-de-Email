@@ -11,8 +11,6 @@ def huggingface_classification(text: str, sender: str):
     try:
         logger.info(f"Classificando com Hugging Face - Texto: {len(text)} chars")
         
-        truncated_text = text[:1000] + "..." if len(text) > 1000 else text
-
         # 1. Classificação do email usando chat completions
         classification_prompt = f"""
         Você trabalha em uma empresa de tecnologia.  
@@ -22,13 +20,13 @@ def huggingface_classification(text: str, sender: str):
         - Produtivo: Pedidos de suporte, resolução de problemas, dúvidas técnicas, solicitações que exigem ação.
         - Improdutivo: Spam, promoções, newsletters, cumprimentos, agradecimentos, sem ação necessária.
 
-        Email: {truncated_text}
+        Email: {text}
 
         Responda APENAS com "Produtivo" ou "Improdutivo".
         """
         
         classification_response = client.chat.completions.create(
-            model="HuggingFaceH4/zephyr-7b-beta",
+            model="distilbert-base-uncased-finetuned-sst-2-english",
             messages=[
                 {"role": "system", "content": "Você é um classificador de e-mails."},
                 {"role": "user", "content": classification_prompt}
@@ -42,7 +40,7 @@ def huggingface_classification(text: str, sender: str):
         logger.info(f"Categoria classificada: '{category}'")
 
         # 2. Gera a resposta baseada na categoria
-        response_text = generate_response_with_hf(category, sender, truncated_text)
+        response_text = generate_response_with_hf(category, sender, text)
 
         return category, response_text
 
@@ -52,7 +50,6 @@ def huggingface_classification(text: str, sender: str):
 
 
 def extract_category(response: str) -> str:
-    """Extrai a categoria da resposta do modelo"""
     text = response.strip().lower()
     if "produtivo" in text:
         return "Produtivo"
@@ -60,7 +57,6 @@ def extract_category(response: str) -> str:
         return "Improdutivo"
     else:
         return "ERROR"
-
 
 def generate_response_with_hf(category: str, sender: str, text: str) -> str:
     logger.info("SENDER = " + sender)
@@ -72,7 +68,7 @@ def generate_response_with_hf(category: str, sender: str, text: str) -> str:
         - Seja breve (1-2 frases)
         - Cite {sender} na mensagem
 
-        Contexto do email: {text[:500]}
+        Contexto do email: {text[:1000]}
 
         Escreva apenas a resposta e NADA além disso.
         """
@@ -82,7 +78,7 @@ def generate_response_with_hf(category: str, sender: str, text: str) -> str:
         mas sem comprometer com ações desnecessárias.
         Seja neutro e breve (1-2 frases).
         
-        Contexto do email: {text[:500]}
+        Contexto do email: {text[:1000]}
         
         Escreva apenas a resposta e NADA além disso.
         """

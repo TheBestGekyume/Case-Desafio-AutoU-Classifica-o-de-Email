@@ -5,7 +5,6 @@ from .huggingface_service import huggingface_classification
 from .fallback_service import classify_email_fallback
 
 logger = logging.getLogger(__name__)
-
 def classify_email(text: str, sender: str):
     logger.info(f"Iniciando classificação - Texto: {len(text)} chars, Remetente: {sender}")
     logger.info(f"Gemini API disponível: {bool(GEMINI_API_KEY)}")
