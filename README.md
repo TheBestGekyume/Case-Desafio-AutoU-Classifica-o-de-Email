@@ -25,7 +25,7 @@ Improdutivo -> Emails que não necessitam de uma ação imediata (ex.: mensagens
 
 ### Infraestrutura
 - **Render** para deploy do backend  
-- **Vercel** (provavelmente) para deploy do frontend  
+- **Vercel** para deploy do frontend  
 - **Variáveis de ambiente** para configuração de APIs  
 
 ---
