@@ -17,15 +17,16 @@ def huggingface_classification(text: str, sender: str):
 
         CRITÉRIOS:
         - Produtivo: Pedidos de suporte, resolução de problemas, dúvidas técnicas, solicitações que exigem ação.
-        - Improdutivo: Spam, promoções, newsletters, cumprimentos, agradecimentos, sem ação necessária.
+        - Improdutivo: Spam, promoções, newsletters, cumprimentos, agradecimentos, convites, festas, sem ação necessária.
 
         Email: {text}
 
+        LEMBRE-SE, VOCÊ ESTÁ EM UM AMBIENTE PROFISSIONAL.
         Responda APENAS com "Produtivo" ou "Improdutivo".
         """
         
         classification_response = client.chat.completions.create(
-            model="HuggingFaceH4/zephyr-7b-beta",
+            model="meta-llama/Llama-2-7b-chat-hf",
             messages=[
                 {"role": "system", "content": "Você é um classificador de e-mails."},
                 {"role": "user", "content": classification_prompt}
@@ -83,7 +84,7 @@ def generate_response(category: str, sender: str, text: str) -> str:
         """
 
     response = client.chat.completions.create(
-        model="HuggingFaceH4/zephyr-7b-beta",
+        model="meta-llama/Llama-2-7b-chat-hf",
         messages=[
             {"role": "system", "content": "Você é um assistente que escreve emails profissionais em português."},
             {"role": "user", "content": prompt}
