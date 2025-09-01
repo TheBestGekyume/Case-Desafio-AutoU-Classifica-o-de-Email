@@ -45,7 +45,7 @@ def gemini_classification(text: str, sender: str):
         # Extrai a categoria da resposta
         category = extract_response(classification_response).strip()
         
-        logger.error(f"Categoria classificada: '{category}'")
+        logger.error(f"Categoria classificada pelo geminni: '{category}'")
         
         response_text = generate_response(category, sender, text, model)
         
