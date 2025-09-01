@@ -12,7 +12,7 @@ Improdutivo -> Emails que não necessitam de uma ação imediata (ex.: mensagens
 - **Python** com FastAPI para a API REST  
 - **spaCy** para processamento de linguagem natural em português  
 - **Google Gemini API** para classificação via IA  
-- **Hugging Face Inference API** com modelo Zephyr-7B  
+- **Hugging Face Inference API** caso o Gemini esteja indisponível
 - **PyPDF2** para extração de texto de arquivos PDF  
 - **Unidecode** para normalização de texto
 - **Fallback** caso os serviços de IA estejam indisponíveis
