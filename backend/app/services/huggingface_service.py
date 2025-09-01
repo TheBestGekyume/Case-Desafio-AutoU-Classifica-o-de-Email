@@ -36,7 +36,7 @@ def huggingface_classification(text: str, sender: str):
 
         category = classification_response.choices[0].message["content"].strip()
         category = extract_category(category)
-        logger.info(f"Categoria classificada: '{category}'")
+        logger.error(f"Categoria classificada: '{category}'")
 
         # 2. Gera a resposta baseada na categoria
         response_text = generate_response(category, sender, text)
@@ -69,7 +69,7 @@ def generate_response(category: str, sender: str, text: str) -> str:
 
         Contexto do email: {text[:1000]}
 
-        Escreva apenas a resposta e NADA além disso.
+        Escreva o corpo do email, sem assunto e nada além disso!
         """
     else:
         prompt = f"""
@@ -79,7 +79,7 @@ def generate_response(category: str, sender: str, text: str) -> str:
         
         Contexto do email: {text[:1000]}
         
-        Escreva apenas a resposta e NADA além disso.
+        Escreva o corpo do email, sem assunto e nada além disso!
         """
 
     response = client.chat.completions.create(
